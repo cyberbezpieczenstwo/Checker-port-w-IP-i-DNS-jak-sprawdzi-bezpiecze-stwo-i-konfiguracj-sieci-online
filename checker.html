@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>NetBe Network Checker</title>
+<style>
+body { font-family: Arial; background:#0f172a; color:#e2e8f0; padding:20px; }
+input, button { padding:10px; margin:5px; width:300px; }
+.box { background:#1e293b; padding:15px; margin-top:15px; border-radius:10px; }
+button { cursor:pointer; }
+</style>
+</head>
+<body>
+
+<h1>🔍 IP / Port / DNS Checker</h1>
+
+<div class="box">
+<h3>🌐 Sprawdź IP (Twoje publiczne)</h3>
+<button onclick="getIP()">Pobierz IP</button>
+<p id="ipResult"></p>
+</div>
+
+<div class="box">
+<h3>🌍 DNS Lookup</h3>
+<input id="domain" placeholder="np. google.com">
+<button onclick="dnsLookup()">Sprawdź DNS</button>
+<p id="dnsResult"></p>
+</div>
+
+<div class="box">
+<h3>🔌 Test portu (HTTP/HTTPS proxy check)</h3>
+<input id="host" placeholder="np. google.com">
+<input id="port" placeholder="np. 443">
+<button onclick="testPort()">Testuj port</button>
+<p id="portResult"></p>
+</div>
+
+<script>
+
+// IP CHECK
+function getIP(){
+fetch("https://api.ipify.org?format=json")
+.then(res => res.json())
+.then(data => {
+document.getElementById("ipResult").innerText = "Twoje IP: " + data.ip;
+});
+}
+
+// DNS LOOKUP (przez Google DNS API)
+function dnsLookup(){
+let domain = document.getElementById("domain").value;
+fetch("https://dns.google/resolve?name=" + domain)
+.then(res => res.json())
+.then(data => {
+document.getElementById("dnsResult").innerText =
+JSON.stringify(data.Answer || "Brak danych", null, 2);
+});
+}
+
+// PORT CHECK (symulacja przez fetch)
+function testPort(){
+let host = document.getElementById("host").value;
+let port = document.getElementById("port").value;
+
+let url = "https://" + host + ":" + port;
+
+fetch(url, { mode: 'no-cors' })
+.then(() => {
+document.getElementById("portResult").innerText =
+"Port " + port + " może być OTWARTY (brak blokady CORS)";
+})
+.catch(() => {
+document.getElementById("portResult").innerText =
+"Port " + port + " może być ZAMKNIĘTY lub zablokowany";
+});
+}
+
+</script>
+
+</body>
+</html>
